@@ -27,4 +27,20 @@ if ! [ -f "/var/www/wp-content/wp-secrets.php" ]; then
         curl -f https://api.wordpress.org/secret-key/1.1/salt/ >> /var/www/wp-content/wp-secrets.php
     fi
 fi
+
+# run composer require
+
+PLUGINS_DIR="/var/www/wp-content/plugins"
+INSTALLED=$(composer show --name-only | grep wpackagist-plugin | sed 's/wpackagist-plugin\///')
+
+for DIR in $PLUGINS_DIR/*; do
+  PLUGIN_NAME=$(basename "$DIR")
+  if ! echo "$INSTALLED" | grep -qx "$PLUGIN_NAME"; then
+    echo "Removing orphaned plugin: $PLUGIN_NAME"
+    rm -rf "$DIR"
+  fi
+done
+
+composer install --working-dir=/usr/src/wordpress
+
 exec "$@"

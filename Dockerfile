@@ -72,6 +72,11 @@ RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh
   && chmod +x /usr/local/bin/wp
 COPY --chown=nobody:nobody wp-cli.yml /usr/src/wordpress/
 
+# Composer installation
+RUN curl -o /usr/local/bin/composer https://getcomposer.org/download/latest-stable/composer.phar \
+  && chmod +x /usr/local/bin/composer  
+COPY --chown=nobody:nobody composer.json /usr/src/wordpress
+
 # WP config
 COPY --chown=nobody:nobody wp-config.php /usr/src/wordpress
 RUN chmod 640 /usr/src/wordpress/wp-config.php
