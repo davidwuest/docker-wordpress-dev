@@ -30,17 +30,22 @@ fi
 
 # run composer require
 
-PLUGINS_DIR="/var/www/wp-content/plugins"
-INSTALLED=$(composer show --name-only | grep wpackagist-plugin | sed 's/wpackagist-plugin\///')
+# Check if composer.json exists and composer is installed
+if [ -f "/usr/src/wordpress/composer.json" ] && command -v composer >/dev/null; then
 
-for DIR in $PLUGINS_DIR/*; do
-  PLUGIN_NAME=$(basename "$DIR")
-  if ! echo "$INSTALLED" | grep -qx "$PLUGIN_NAME"; then
-    echo "Removing orphaned plugin: $PLUGIN_NAME"
-    rm -rf "$DIR"
-  fi
-done
+# Clean up plugins directory
+    
+    PLUGINS_DIR="/var/www/wp-content/plugins"
+    INSTALLED=$(composer show --name-only | grep wpackagist-plugin | sed 's/wpackagist-plugin\///')
 
+    for DIR in $PLUGINS_DIR/*; do
+    PLUGIN_NAME=$(basename "$DIR")
+    if ! echo "$INSTALLED" | grep -qx "$PLUGIN_NAME"; then
+        echo "Removing orphaned plugin: $PLUGIN_NAME"
+        rm -rf "$DIR"
+    fi
+    done    
+# apply composer.json
 composer install --working-dir=/usr/src/wordpress
-
+fi
 exec "$@"
